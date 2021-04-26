@@ -27,6 +27,7 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>artemis-server</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
