@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import java.util.UUID;
@@ -22,7 +23,7 @@ public class HelloMessageListener {
 
     @JmsListener(destination = JmsConfig.MY_QUEUE)
     public void listen(@Payload HelloWorldMessage helloWorldMessage,
-                       @Headers MessageHeaders headers, Message message, org.springframework.messaging.Message<HelloWorldMessage> springMessage) {
+                       @Headers MessageHeaders headers, Message message) {
         System.out.println("Got a message");
 
         System.out.println(helloWorldMessage);
@@ -30,14 +31,16 @@ public class HelloMessageListener {
 
     @JmsListener(destination = JmsConfig.MY_RECEIVE_QUEUE)
     public void listenForSendAndReceive(@Payload HelloWorldMessage helloWorldMessage,
-                                        @Headers MessageHeaders headers, Message message) throws JMSException {
+                                        @Headers MessageHeaders headers, Message message, org.springframework.messaging.Message<HelloWorldMessage> springMessage) throws JMSException {
 
         var payload = HelloWorldMessage.builder()
                 .id(UUID.randomUUID())
                 .message("Confirm message")
                 .build();
 
-        jmsTemplate.convertAndSend(message.getJMSReplyTo(), payload);
+//        jmsTemplate.convertAndSend(message.getJMSReplyTo(), payload);
+
+        jmsTemplate.convertAndSend((Destination) springMessage.getHeaders().get("jms_replyTo"), payload);
 
     }
 }
